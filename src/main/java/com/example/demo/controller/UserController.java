@@ -74,7 +74,7 @@ public class UserController {
     }
     //ne pas mettre d'id dans les routes remplacer par un autre uuid
     @Operation(summary = "Update user", description = "Update user")
-    @PutMapping("/{id}")
+    @PutMapping("/edit/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User user,
             @RequestParam(defaultValue = "none") String picture) {
         switch (picture) {
