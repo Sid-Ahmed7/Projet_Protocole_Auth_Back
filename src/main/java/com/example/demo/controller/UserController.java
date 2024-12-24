@@ -64,6 +64,7 @@ public class UserController {
     public ResponseEntity<?> loginUser(@RequestBody User users) {
         User user = userService.findByemail(users.getEmail());
         if (user != null && passwordEncoder.matches(users.getPassword(), user.getPassword())) {
+            //Ajouter audit username pour jwt donc supprimer l'username dans le JWT
             String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getSlug());
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
@@ -71,7 +72,7 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
     }
-
+    //ne pas mettre d'id dans les routes remplacer par un autre uuid
     @Operation(summary = "Update user", description = "Update user")
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User user,
@@ -91,6 +92,7 @@ public class UserController {
         }
     }
 
+    //ne pas mettre d'id dans les routes remplacer par un uuid
     @Operation(summary = "Delete user", description = "Delete user")
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
