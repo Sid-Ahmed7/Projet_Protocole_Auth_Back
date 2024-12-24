@@ -1,8 +1,10 @@
 package com.example.demo.config;
 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,14 +19,14 @@ public class SecurityConfiguration {
     private String jwtSecret;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-            .anyRequest().permitAll()
-                .and().httpBasic();
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())  
+            .authorizeHttpRequests(authz -> 
+                authz.anyRequest().permitAll()  
+            )
+            .httpBasic(Customizer.withDefaults());
         return http.build();
-
     }
 
     @Bean
