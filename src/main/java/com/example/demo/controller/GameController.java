@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,35 +20,35 @@ import com.example.demo.service.UserService;
 @RestController
 @RequestMapping("/games")
 public class GameController {
+
     @Autowired
     private UserService userService;
 
     @PostMapping("/add")
     public ResponseEntity<?> addGameToList(@RequestParam Long gameId,
             @RequestHeader("Authorization") String token) {
-        Long userId = userService.getIdInToken(token);
-        userService.addGame(userId, gameId);
+        UUID userUuid = userService.getUuidInToken(token); 
+        userService.addGame(userUuid, gameId); 
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @GetMapping("")
-    public ResponseEntity<List<GameDTO>> getListGames(@RequestParam Long user_id,
+    public ResponseEntity<List<GameDTO>> getListGames(@RequestParam UUID userId, 
             @RequestHeader("Authorization") String token) {
-        Long userIdToken = userService.getIdInToken(token);
-        if (!user_id.equals(userIdToken)) {
+        UUID userUuidFromToken = userService.getUuidInToken(token); 
+        if (!userId.equals(userUuidFromToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        List<GameDTO> games = userService.getList(user_id);
+        List<GameDTO> games = userService.getList(userId); 
         return new ResponseEntity<>(games, HttpStatus.OK);
     }
 
     @DeleteMapping()
-    public ResponseEntity<List<GameDTO>> deleteGame(Long gameId,
+    public ResponseEntity<List<GameDTO>> deleteGame(@RequestParam Long gameId,
             @RequestHeader("Authorization") String token) {
-        Long userIdToken = userService.getIdInToken(token);
+        UUID userUuidFromToken = userService.getUuidInToken(token); 
 
-        List<GameDTO> updatedGames = userService.deleteGame(userIdToken, gameId);
+        List<GameDTO> updatedGames = userService.deleteGame(userUuidFromToken, gameId); 
         return ResponseEntity.ok(updatedGames);
-
     }
 }

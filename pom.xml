@@ -120,7 +120,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		  </dependency>
-	</dependencies>
+	
+   <dependency>
+     <groupId>javax</groupId>
+     <artifactId>javaee-api</artifactId>
+     <version>8.0.1</version>
+   </dependency>
+ </dependencies>
 
 	<build>
 		<plugins>

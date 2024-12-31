@@ -1,7 +1,10 @@
 package com.example.demo.entity;
 
-import java.util.List;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,16 +19,18 @@ import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+
 import jakarta.validation.constraints.Size;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID uuid;
 
     @Column(unique = true)
     @NotBlank(message = "Veuillez renseigner un nom d'utilisateur")
@@ -62,6 +67,14 @@ public class User {
     @JoinTable(name = "user_game", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "game_id"))
     private List<Game> games = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER) 
+    @JoinTable(
+            name = "user_role", 
+            joinColumns = @JoinColumn(name = "user_uuid"), 
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
     public User() {
     }
 
@@ -87,10 +100,15 @@ public class User {
         this.slug = slug;
         this.role = role;
     }
-
-    public Long getId() {
-        return this.id;
+@Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
     }
+public UUID getUuid() {
+    return this.uuid;
+}
 
     public String getUsername() {
         return this.username;
@@ -122,6 +140,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    public Set<Role> getRoles() {
+        return this.roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     public boolean isRole() {
@@ -179,5 +204,23 @@ public class User {
     public void setGames(List<Game> games) {
         this.games = games;
     }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Implémentez votre logique ici
+    }
 
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Implémentez votre logique ici
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Implémentez votre logique ici
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Implémentez votre logique ici
+    }
 }

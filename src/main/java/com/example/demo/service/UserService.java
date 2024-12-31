@@ -3,6 +3,7 @@ package com.example.demo.service;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.config.JwtService;
@@ -29,21 +30,27 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
+
     private Game game = new Game();
 
     public List<User> getAll() {
-        List<User> users = this.userRepository.findAll();
-        return users;
+        return this.userRepository.findAll();
     }
 
-    public User getOneById(Long id) {
-        User user = this.userRepository.findById(id).get();
-        return user;
+    public User getOneByUuid(UUID uuid) {
+        return this.userRepository.findByUuid(uuid).orElseThrow(() -> new IllegalArgumentException("User not found with UUID: " + uuid));
+    }
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public User findByUuid(UUID uuid) {
+        Optional<User> userOptional = userRepository.findByUuid(uuid);
+        return userOptional.orElseThrow(() -> new RuntimeException("User not found with UUID: " + uuid));
     }
 
     public User getOneBySlug(String slug) {
-        User user = this.userRepository.findBySlug(slug);
-        return user;
+        return this.userRepository.findBySlug(slug);
     }
 
     public User createUser(User user) {
@@ -51,12 +58,12 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
-    public User findByemail(String email) {
+    public User findByEmail(String email) {
         return this.userRepository.findByEmail(email);
     }
 
-    public User updateUser(Long id, User user) {
-        User retrievedUser = this.userRepository.findById(id).get();
+    public User updateUser(UUID uuid, User user) {
+        User retrievedUser = this.userRepository.findByUuid(uuid).orElseThrow(() -> new IllegalArgumentException("User not found with UUID: " + uuid));
         retrievedUser.setUsername(user.getUsername());
         retrievedUser.setSlug(slugify.slugify(user.getUsername()));
         retrievedUser.setEmail(user.getEmail());
@@ -64,32 +71,31 @@ public class UserService {
         if (user.getPassword() != null) {
             retrievedUser.setPassword(user.getPassword());
         }
-        
         return this.userRepository.save(retrievedUser);
     }
 
-    public User updateBanner(Long id, User user) {
-        User retrievedUser = this.userRepository.findById(id).get();
+    public User updateBanner(UUID uuid, User user) {
+        User retrievedUser = this.userRepository.findByUuid(uuid).orElseThrow(() -> new IllegalArgumentException("User not found with UUID: " + uuid));
         retrievedUser.setBannerPicture(user.getBannerPicture());
         return this.userRepository.save(retrievedUser);
     }
 
-    public User updateProfilePicture(Long id, User user) {
-        User retrievedUser = this.userRepository.findById(id).get();
+    public User updateProfilePicture(UUID uuid, User user) {
+        User retrievedUser = this.userRepository.findByUuid(uuid).orElseThrow(() -> new IllegalArgumentException("User not found with UUID: " + uuid));
         retrievedUser.setProfilePicture(user.getProfilePicture());
         return this.userRepository.save(retrievedUser);
     }
 
-    public void deleteUser(Long id) {
-        this.userRepository.deleteById(id);
+    public void deleteUser(UUID uuid) {
+        this.userRepository.deleteById(uuid);
     }
 
-    public Long findUserIdByUsername(String username) {
+    public UUID findUserUuidByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user != null) {
-            return user.getId();
+            return user.getUuid();
         } else {
-            throw new IllegalArgumentException("User not found");
+            throw new IllegalArgumentException("User not found with username: " + username);
         }
     }
 
@@ -98,19 +104,18 @@ public class UserService {
         if (user != null) {
             return user.getSlug();
         } else {
-            throw new IllegalArgumentException("User slug not found");
+            throw new IllegalArgumentException("User slug not found with username: " + username);
         }
     }
 
-    public void addGame(Long userId, Long gameId) {
-        Optional<User> user = userRepository.findById(userId);
+    public void addGame(UUID userUuid, Long gameId) {
+        Optional<User> user = userRepository.findByUuid(userUuid);
         if (user.isPresent()) {
 
             Optional<Game> retrievedGame = gameRepository.findById(gameId);
 
             if (retrievedGame.isPresent()) {
                 this.game = retrievedGame.get();
-
             } else {
                 game.setId(gameId);
                 gameRepository.save(game);
@@ -125,7 +130,7 @@ public class UserService {
                 throw new IllegalArgumentException("Game is already registered in the user list");
             }
         } else {
-            throw new IllegalArgumentException("User not found with id: " + userId);
+            throw new IllegalArgumentException("User not found with UUID: " + userUuid);
         }
     }
 
@@ -135,24 +140,23 @@ public class UserService {
         return gameDTO;
     }
 
-    public List<GameDTO> getList(Long userId) {
-
-        Optional<User> userOptional = userRepository.findById(userId);
+    public List<GameDTO> getList(UUID userUuid) {
+        // Correctly handle the Optional returned by findByUuid
+        Optional<User> userOptional = userRepository.findByUuid(userUuid);
+        
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return user.getGames().stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
+            User user = userOptional.get();  // Retrieve the User object
+            return user.getGames().stream()  // Get the games associated with the user
+                    .map(this::convertToDTO)  // Convert each game to GameDTO
+                    .collect(Collectors.toList());  // Collect the result into a List
         } else {
-            throw new IllegalArgumentException("User not found with id: " + userId);
-
+            throw new IllegalArgumentException("User not found with UUID: " + userUuid);
         }
-
     }
+    
 
-    public List<GameDTO> deleteGame(Long userId, Long gameId) {
-
-        Optional<User> userOptional = userRepository.findById(userId);
+    public List<GameDTO> deleteGame(UUID userUuid, Long gameId) {
+        Optional<User> userOptional = userRepository.findByUuid(userUuid);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
@@ -168,17 +172,19 @@ public class UserService {
                         .map(this::convertToDTO)
                         .collect(Collectors.toList());
             } else {
-                throw new IllegalArgumentException("le jeux n'est pas dans la liste: " + gameId);
+                throw new IllegalArgumentException("Game not found in the user's list: " + gameId);
             }
         } else {
-            throw new IllegalArgumentException("User not found with id: " + userId);
+            throw new IllegalArgumentException("User not found with UUID: " + userUuid);
         }
     }
 
-    public Long getIdInToken(String token) {
-        String username = jwtService.extractUsername(token);
-        Long userId = this.findUserIdByUsername(username);
-        return userId;
+    public UUID getUuidInToken(String token) {
+        try {
+            return jwtService.extractUuid(token);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Impossible d'extraire l'UUID du token : " + e.getMessage(), e);
+        }
     }
 
     public String getSlugInToken(String token) {

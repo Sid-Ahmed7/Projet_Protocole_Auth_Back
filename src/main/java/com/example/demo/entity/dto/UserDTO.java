@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 
 public class UserDTO {
 
-    private Long id;
+    private UUID uuid;
 
     @NotBlank(message = "Veuillez renseigner un nom d'utilisateur")
     @Size(min = 3, max = 15, message = "Le nom d'utilisateur doit faire entre 3 et 15 caractères de long")
@@ -62,8 +62,8 @@ public class UserDTO {
         this.role = role;
     }
 
-    public Long getId() {
-        return this.id;
+    public UUID getUuid() {
+        return this.uuid;
     }
 
     public String getUsername() {

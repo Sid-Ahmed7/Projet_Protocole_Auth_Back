@@ -13,7 +13,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-
 @Service
 public class JwtService {
 
@@ -23,11 +22,11 @@ public class JwtService {
     @Value("${app.expiration-time}")
     private long expirationTime;
 
-    public String generateToken(Long id, String username, String slug) {
+    public String generateToken(UUID uuid,String slug) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", id);
+        claims.put("uuid", uuid.toString());  
         claims.put("slug", slug);
-        return createToken(claims, username);
+        return createToken(claims, uuid.toString());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -58,7 +57,25 @@ public class JwtService {
                 .getBody();
     }
 
+   
+    public UUID extractUuid(String token) {
+        return UUID.fromString(extractClaim(token, claims -> claims.get("uuid", String.class)));
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+
+    public boolean isTokenExpired(String token) {
+        Date expiration = extractClaim(token, Claims::getExpiration);  
+        return expiration.before(new Date());  
+    }
+    
+    public boolean validateToken(String token, UUID uuid) {
+        final UUID extractedUuid = extractUuid(token);
+        return (extractedUuid.equals(uuid) && !isTokenExpired(token));
+    }
+    
+
+    
 }
