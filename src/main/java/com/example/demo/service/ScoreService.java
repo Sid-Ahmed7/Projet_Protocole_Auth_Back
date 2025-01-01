@@ -32,7 +32,7 @@ public class ScoreService {
     public Optional<Score> update(Long id, Score scoreDetails) {
         return scoreRepository.findById(id).map(score -> {
             score.setScore(scoreDetails.getScore());
-            score.setUserId(scoreDetails.getUserId());
+            score.setUserUuid(scoreDetails.getUserUuid());
             score.setGameId(scoreDetails.getGameId());
             return scoreRepository.save(score);
         });

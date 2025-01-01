@@ -20,7 +20,7 @@ public class Commentary {
 
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_uuid")
     private User user;
 
     public Commentary(String content, User user, int gameId) {

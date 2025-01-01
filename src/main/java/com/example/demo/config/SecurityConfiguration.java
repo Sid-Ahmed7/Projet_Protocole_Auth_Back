@@ -32,10 +32,8 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable())  
             .authorizeHttpRequests(authz -> 
                 authz
-                        .requestMatchers("/games/**", "/commentaries/**", "/notes/**", "/users/edit/**").hasAnyRole("USER")
-                        .requestMatchers("/users/delete/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/users/register", "/users/login").permitAll()
-                        .anyRequest().authenticated()
+                     .anyRequest().permitAll()
+                        
             )
            .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

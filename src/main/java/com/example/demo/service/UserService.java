@@ -87,7 +87,7 @@ public class UserService {
     }
 
     public void deleteUser(UUID uuid) {
-        this.userRepository.deleteById(uuid);
+        this.userRepository.deleteByUuid(uuid);
     }
 
     public UUID findUserUuidByUsername(String username) {
@@ -141,14 +141,13 @@ public class UserService {
     }
 
     public List<GameDTO> getList(UUID userUuid) {
-        // Correctly handle the Optional returned by findByUuid
         Optional<User> userOptional = userRepository.findByUuid(userUuid);
         
         if (userOptional.isPresent()) {
-            User user = userOptional.get();  // Retrieve the User object
-            return user.getGames().stream()  // Get the games associated with the user
-                    .map(this::convertToDTO)  // Convert each game to GameDTO
-                    .collect(Collectors.toList());  // Collect the result into a List
+            User user = userOptional.get();  
+            return user.getGames().stream()  
+                    .map(this::convertToDTO)  
+                    .collect(Collectors.toList());  
         } else {
             throw new IllegalArgumentException("User not found with UUID: " + userUuid);
         }

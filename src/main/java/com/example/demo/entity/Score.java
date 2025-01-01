@@ -1,7 +1,7 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-
+import java.util.*;
 @Entity
 @Table(name = "score")
 public class Score {
@@ -9,16 +9,16 @@ public class Score {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long score;
-    private Long UserId;
+    private UUID UserUuid;
     private Long GameId;
 
     public Score() {
     }
 
-    public Score(Long id, Long score, Long userId, Long gameId) {
+    public Score(Long id, Long score, UUID userUuid, Long gameId) {
         this.id = id;
         this.score = score;
-        UserId = userId;
+        UserUuid = userUuid;
         GameId = gameId;
     }
 
@@ -38,12 +38,12 @@ public class Score {
         this.score = score;
     }
 
-    public Long getUserId() {
-        return UserId;
+    public UUID getUserUuid() {
+        return UserUuid;
     }
 
-    public void setUserId(Long userId) {
-        UserId = userId;
+    public void setUserUuid(UUID userUuid) {
+        UserUuid = userUuid;
     }
 
     public Long getGameId() {
