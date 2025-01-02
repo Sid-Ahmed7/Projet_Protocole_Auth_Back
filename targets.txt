@@ -16,13 +16,13 @@ Content-Type: application/json
 
 
 POST http://localhost:8080/games/add?gameId=26668
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Niwic2x1ZyI6InRlc3R1c2VyIiwic3ViIjoidGVzdHVzZXIiLCJpYXQiOjE3MzU4NDQ2MTQsImV4cCI6MTczNTkzMTAxNH0.H8LGZb1KiTNhJBEf8KQg0H712sMUBN2HvUcfwrQG4jY
+Authorization: Bearer {token}
 
 GET http://localhost:8080/games?user_id=6
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Niwic2x1ZyI6InRlc3R1c2VyIiwic3ViIjoidGVzdHVzZXIiLCJpYXQiOjE3MzU4NDQ2MTQsImV4cCI6MTczNTkzMTAxNH0.H8LGZb1KiTNhJBEf8KQg0H712sMUBN2HvUcfwrQG4jY
+Authorization: Bearer {token}
 
 DELETE http://localhost:8080/games?gameId=26668
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Niwic2x1ZyI6InRlc3R1c2VyIiwic3ViIjoidGVzdHVzZXIiLCJpYXQiOjE3MzU4NDQ2MTQsImV4cCI6MTczNTkzMTAxNH0.H8LGZb1KiTNhJBEf8KQg0H712sMUBN2HvUcfwrQG4jY
+Authorization: Bearer {token}
 
 GET http://localhost:8080/commentaries
 
@@ -35,7 +35,7 @@ Content-Type: application/json
 
 
 DELETE http://localhost:8080/commentaries/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Niwic2x1ZyI6InRlc3R1c2VyIiwic3ViIjoidGVzdHVzZXIiLCJpYXQiOjE3MzU4NDQ2MTQsImV4cCI6MTczNTkzMTAxNH0.H8LGZb1KiTNhJBEf8KQg0H712sMUBN2HvUcfwrQG4jY
+Authorization: Bearer {token}
 
 
 GET http://localhost:8080/notes
@@ -55,4 +55,4 @@ Content-Type: application/json
 
 
 DELETE http://localhost:8080/notes/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Niwic2x1ZyI6InRlc3R1c2VyIiwic3ViIjoidGVzdHVzZXIiLCJpYXQiOjE3MzU4NDQ2MTQsImV4cCI6MTczNTkzMTAxNH0.H8LGZb1KiTNhJBEf8KQg0H712sMUBN2HvUcfwrQG4jY
+Authorization: Bearer {token}
