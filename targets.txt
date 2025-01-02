@@ -2,18 +2,7 @@
 GET http://localhost:8080/users
 
 # GET /users/{slug}
-GET http://localhost:8080/users/testuser
-
-# POST /users/register
-POST http://localhost:8080/users/register
-Content-Type: application/json
-@./data/register.json
-
-# POST /users/login
-POST http://localhost:8080/users/login
-Content-Type: application/json
-@./data/login.json
-
+GET http://localhost:8080/users/testUser
 
 POST http://localhost:8080/games/add?gameId=26668
 Authorization: Bearer {token}
@@ -22,37 +11,4 @@ GET http://localhost:8080/games?user_id=6
 Authorization: Bearer {token}
 
 DELETE http://localhost:8080/games?gameId=26668
-Authorization: Bearer {token}
-
-GET http://localhost:8080/commentaries
-
-
-GET http://localhost:8080/commentaries/1
-
-POST http://localhost:8080/commentaries
-Content-Type: application/json
-@./data/commentary.json
-
-
-DELETE http://localhost:8080/commentaries/1
-Authorization: Bearer {token}
-
-
-GET http://localhost:8080/notes
-
-
-GET http://localhost:8080/notes/1
-
-
-POST http://localhost:8080/notes
-Content-Type: application/json
-@./data/score.json
-
-
-PUT http://localhost:8080/notes/1
-Content-Type: application/json
-@./data/score.json
-
-
-DELETE http://localhost:8080/notes/1
 Authorization: Bearer {token}
