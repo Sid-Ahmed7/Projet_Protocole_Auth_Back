@@ -28,17 +28,18 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+
+  
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String requestTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
+        final String requestTokenHeader = request.getHeader("Authorization");
         UUID uuid = null;
         String jwtToken = null;
 
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+            jwtToken = requestTokenHeader.split(" ")[1].trim();
             try {
                 uuid = jwtService.extractUuid(jwtToken);
             } catch (Exception e) {
@@ -60,4 +61,5 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+ 
 }
