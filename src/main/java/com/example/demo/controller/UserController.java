@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.example.demo.service.LoginAttemptService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
+import com.example.demo.service.BruteForceProtectionService;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.RoleRepository;
 
@@ -38,8 +38,10 @@ public class UserController {
 
     @Autowired
     private JwtService jwtService;
+
+
     @Autowired
-    private LoginAttemptService loginAttemptService;
+    private BruteForceProtectionService bruteForceProtectionService;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -77,24 +79,29 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User users) {
-        if (loginAttemptService.isBlocked(users.getEmail())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account locked. Please try again later.");
+        if (bruteForceProtectionService.isBlocked(users.getEmail())) {
+            long remainingTime = bruteForceProtectionService.getRemainingLockTime(users.getEmail());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Account locked. Please try again after " + remainingTime + " seconds.");
         }
     
         User user = userService.findByEmail(users.getEmail());
+        
         if (user != null && passwordEncoder.matches(users.getPassword(), user.getPassword())) {
-            loginAttemptService.registerLoginAttempt(users.getEmail(), true);
-    
+            bruteForceProtectionService.loginSucceeded(users.getEmail());
+            
             String token = jwtService.generateToken(user.getUuid());
+            
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
             return ResponseEntity.ok(response);
         }
     
-        loginAttemptService.registerLoginAttempt(users.getEmail(), false);
-        
+        bruteForceProtectionService.loginFailed(users.getEmail());
+    
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
     }
+    
     @Operation(summary = "Update user", description = "Update user")
     @PutMapping("/edit/{uuid}")
     public User updateUser(@PathVariable UUID uuid, @RequestBody User user,
@@ -119,16 +126,7 @@ public class UserController {
     public void deleteUser(@PathVariable UUID uuid) {
         this.userService.deleteUser(uuid);
     }
-    @GetMapping("/get-token")
-    public String getTokenFromHeader(@RequestHeader("Authorization") String authorizationHeader) {
-        // Vérification et traitement du header Authorization
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7); // On enlève "Bearer " du début
-            return "Token: " + token;
-        } else {
-            return "Header Authorization invalide.";
-        }
-    }
+ 
 
 
 

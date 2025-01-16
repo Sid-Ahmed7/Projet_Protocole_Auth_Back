@@ -32,7 +32,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/games/**", "/commentaries/**", "/notes/**", "/users/edit/**").hasAnyRole("USER")
                         .requestMatchers("/users/delete/**").hasAnyRole("ADMIN")
                         .requestMatchers("/users/register", "/users/login").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
             )
            .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
