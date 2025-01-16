@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.springframework.web.util.HtmlUtils;
 
-public class XSSSanitizer {
+public class XSSanitizer {
     private static List<Pattern> xssInputPatterns = new ArrayList<>();
 
     static {

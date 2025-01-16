@@ -31,7 +31,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
         String[] values = super.getParameterValues(parameter);
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
-                values[i] = XSSSanitizer.stripXSS(values[i]);  
+                values[i] = XSSanitizer.stripXSS(values[i]);  
             }
         }
         return values;
@@ -41,7 +41,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
     public String getParameter(String parameter) {
         String value = super.getParameter(parameter);
         if (value != null) {
-            value = XSSSanitizer.stripXSS(value); 
+            value = XSSanitizer.stripXSS(value); 
         }
         return value;
     }
@@ -50,7 +50,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
     public String getHeader(String name) {
         String value = super.getHeader(name);
         if (value != null) {
-            value = XSSSanitizer.stripXSS(value);  
+            value = XSSanitizer.stripXSS(value);  
         }
         return value;
     }
@@ -100,7 +100,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
             objectNode.fields().forEachRemaining(entry -> {
                 JsonNode valueNode = entry.getValue();
                 if (valueNode.isTextual()) {
-                    objectNode.put(entry.getKey(), XSSSanitizer.stripXSS(valueNode.textValue()));  
+                    objectNode.put(entry.getKey(), XSSanitizer.stripXSS(valueNode.textValue()));  
                 } else if (valueNode.isObject() || valueNode.isArray()) {
                     sanitizeJsonNode(valueNode);
                 }
@@ -112,7 +112,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
                 if (jsonNode.isObject()) {
                     sanitizeJsonNode(jsonNode);
                 } else if (jsonNode.isTextual()) {
-                    arrayNode.set(i, new TextNode(XSSSanitizer.stripXSS(jsonNode.textValue())));  
+                    arrayNode.set(i, new TextNode(XSSanitizer.stripXSS(jsonNode.textValue())));  
                 }
             }
         }
