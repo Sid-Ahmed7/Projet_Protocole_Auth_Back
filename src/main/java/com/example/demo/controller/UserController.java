@@ -85,7 +85,7 @@ public class UserController {
         if (user != null && passwordEncoder.matches(users.getPassword(), user.getPassword())) {
             loginAttemptService.registerLoginAttempt(users.getEmail(), true);
     
-            String token = jwtService.generateToken(user.getUuid(), user.getSlug());
+            String token = jwtService.generateToken(user.getUuid());
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
             return ResponseEntity.ok(response);
@@ -119,7 +119,16 @@ public class UserController {
     public void deleteUser(@PathVariable UUID uuid) {
         this.userService.deleteUser(uuid);
     }
-
+    @GetMapping("/get-token")
+    public String getTokenFromHeader(@RequestHeader("Authorization") String authorizationHeader) {
+        // Vérification et traitement du header Authorization
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7); // On enlève "Bearer " du début
+            return "Token: " + token;
+        } else {
+            return "Header Authorization invalide.";
+        }
+    }
 
 
 
