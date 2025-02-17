@@ -74,9 +74,21 @@ public class User implements UserDetails{
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+    @Column(name = "account_non_locked", nullable = false)
+    private boolean accountNonLocked = true;
+
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = true;
+
+    @Column(name = "enable", nullable = false)
+    private boolean enable = true;
+
+    @Column(name = "failed_attempt", nullable = false)
+    private int failedAttempt = 0; 
+
 
     public User() {
-    }
+        }
 
     public User(String username, String email, String password) {
         this.uuid = UUID.randomUUID();
@@ -84,6 +96,7 @@ public class User implements UserDetails{
         this.email = email;
         this.password = password;
         this.role = false;
+        this.enable = true;
     }
 
     public User(String username, String email, String newPassword, String biography) {
@@ -207,21 +220,32 @@ public UUID getUuid() {
     }
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Implémentez votre logique ici
+        return true; 
     }
 
     @Override
+    @Column(name = "account_non_locked", nullable = false)
     public boolean isAccountNonLocked() {
-        return true; // Implémentez votre logique ici
+        return true; 
+    }
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Implémentez votre logique ici
+        return true; 
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // Implémentez votre logique ici
+        return true; 
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+    public void setFailedAttempt(int failedAttempt) {
+        this.failedAttempt = failedAttempt;
     }
 }

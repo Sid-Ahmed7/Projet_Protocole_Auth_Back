@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +25,10 @@ import com.example.demo.repository.RoleRepository;
 
 import com.example.demo.config.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.*;
 
 @RestController
@@ -57,7 +62,7 @@ public class UserController {
     public User getOneByUUID(@PathVariable UUID uuid) {
         return this.userService.getOneByUuid(uuid);
     }
-
+    
     @Operation(summary = "Create user", description = "Create user")
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user) {
@@ -66,6 +71,7 @@ public class UserController {
         }
         String encodePassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodePassword);
+        user.setAccountNonLocked(true);
             Role userRole = roleRepository.findByName("USER");
     if (userRole == null) {
         userRole = new Role("USER"); 
@@ -74,33 +80,45 @@ public class UserController {
 
     user.getRoles().add(userRole);  
         this.userService.createUser(user);
-        return ResponseEntity.ok("Utilisateur créé avec succès");
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody User users) {
+    public ResponseEntity<?> loginUser(@RequestBody User users, HttpServletResponse response) {
         if (bruteForceProtectionService.isBlocked(users.getEmail())) {
             long remainingTime = bruteForceProtectionService.getRemainingLockTime(users.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Account locked. Please try again after " + remainingTime + " seconds.");
+                    .body(Map.of("message", "Account locked. Please try again after " + remainingTime + " seconds."));
         }
     
         User user = userService.findByEmail(users.getEmail());
-        
+    
         if (user != null && passwordEncoder.matches(users.getPassword(), user.getPassword())) {
             bruteForceProtectionService.loginSucceeded(users.getEmail());
+    
             
             String token = jwtService.generateToken(user.getUuid());
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
-            return ResponseEntity.ok(response);
+    
+            ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                    .httpOnly(true)  
+                    .secure(false)   
+                    .path("/")      
+                    .maxAge(-1)      
+                    .sameSite("Strict")
+                    .build();
+    
+            response.addHeader("Set-Cookie", cookie.toString());
+    
+            return ResponseEntity.ok().build();
         }
     
         bruteForceProtectionService.loginFailed(users.getEmail());
     
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Invalid credentials."));
     }
+    
+    
     
     @Operation(summary = "Update user", description = "Update user")
     @PutMapping("/edit/{uuid}")
@@ -127,6 +145,21 @@ public class UserController {
         this.userService.deleteUser(uuid);
     }
  
+    @PostMapping("/logout")
+public ResponseEntity<?> logoutUser(HttpServletResponse response) {
+    ResponseCookie cookie = ResponseCookie.from("jwt", "")
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(0) 
+            .sameSite("Strict")
+            .build();
+
+    response.addHeader("Set-Cookie", cookie.toString());
+
+    return ResponseEntity.ok("Utilisateur déconnecté avec succès");
+}
+
 
 
 
