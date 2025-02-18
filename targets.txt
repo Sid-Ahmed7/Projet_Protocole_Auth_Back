@@ -5,10 +5,10 @@ GET http://localhost:8080/users
 GET http://localhost:8080/users/testUser
 
 POST http://localhost:8080/games/add?gameId=26668
-Authorization: Bearer {token}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Niwic2x1ZyI6InRlc3R1c2VyIiwic3ViIjoidGVzdFVzZXIiLCJpYXQiOjE3Mzk5MDcwNjMsImV4cCI6MTczOTkxMDY2M30.rcuAPeMBrRUHzaaxg1iqbiFbtOY9ibt4VDTl3adSY5s
 
 GET http://localhost:8080/games?user_id=6
-Authorization: Bearer {token}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Niwic2x1ZyI6InRlc3R1c2VyIiwic3ViIjoidGVzdFVzZXIiLCJpYXQiOjE3Mzk5MDcwNjMsImV4cCI6MTczOTkxMDY2M30.rcuAPeMBrRUHzaaxg1iqbiFbtOY9ibt4VDTl3adSY5s
 
 DELETE http://localhost:8080/games?gameId=26668
-Authorization: Bearer {token}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Niwic2x1ZyI6InRlc3R1c2VyIiwic3ViIjoidGVzdFVzZXIiLCJpYXQiOjE3Mzk5MDcwNjMsImV4cCI6MTczOTkxMDY2M30.rcuAPeMBrRUHzaaxg1iqbiFbtOY9ibt4VDTl3adSY5s

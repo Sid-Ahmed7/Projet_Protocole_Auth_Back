@@ -40,5 +40,14 @@ sed -i "s|{token}|$token|g" ./targets.txt
 echo "Token JWT a été inséré dans targets.txt."
 
 
-echo "Lancer le test avec Vegeta..."
-vegeta attack -duration=30s -rate=5 --targets=./targets.txt | vegeta report
+vegeta attack -duration=30s -rate=5 --targets=./targets.txt | tee results.bin | vegeta report
+
+if [ ! -f results.bin ]; then
+  echo "❌ Erreur : results.bin n'a pas été créé ! Vérifie ton test Vegeta."
+  exit 1
+fi
+
+echo "Génération du graphique interactif..."
+vegeta plot results.bin > plot.html
+
+echo "✅ Graphique généré : Ouvre plot.html dans ton navigateur !"
