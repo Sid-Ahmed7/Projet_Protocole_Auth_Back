@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,11 +58,22 @@ public class UserController {
         return this.userService.getAll();
     }
 
-    @Operation(summary = "Get one user by slug", description = "Get one user by slug")
-    @GetMapping("/profile/{uuid}")
-    public User getOneByUUID(@PathVariable UUID uuid) {
-        return this.userService.getOneByUuid(uuid);
+@GetMapping("/profile/{uuid}")
+public ResponseEntity<?> getProfile(@CookieValue(name = "jwt", required = false) String token) {
+    if (token == null || token.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No token provided");
     }
+    UUID uuid = jwtService.extractUuid(token);
+    if (uuid == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+    }
+    User user = userService.getOneByUuid(uuid);
+    if (user == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
+
+    return ResponseEntity.ok(user);
+}
     
     @Operation(summary = "Create user", description = "Create user")
     @PostMapping("/register")
@@ -71,10 +83,9 @@ public class UserController {
         }
         String encodePassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodePassword);
-        user.setAccountNonLocked(true);
-            Role userRole = roleRepository.findByName("USER");
+            Role userRole = roleRepository.findByName("User");
     if (userRole == null) {
-        userRole = new Role("USER"); 
+        userRole = new Role("User"); 
         roleRepository.save(userRole);
     }
 
@@ -122,28 +133,54 @@ public class UserController {
     
     @Operation(summary = "Update user", description = "Update user")
     @PutMapping("/edit/{uuid}")
-    public User updateUser(@PathVariable UUID uuid, @RequestBody User user,
-            @RequestParam(defaultValue = "none") String picture) {
+    public ResponseEntity<?> updateUser(@CookieValue(name = "jwt", required = false) String token,
+                                        @PathVariable UUID uuid, 
+                                        @RequestBody User user,
+                                        @RequestParam(defaultValue = "none") String picture) {
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No token provided");
+        }
+        
+        UUID tokenUuid = jwtService.extractUuid(token);
+        if (tokenUuid == null || !tokenUuid.equals(uuid)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or user mismatch");
+        }
+        
         switch (picture) {
             case "banner":
-                return this.userService.updateBanner(uuid, user);
-
+                userService.updateBanner(uuid, user);
+                break;
+    
             case "profile":
-                return this.userService.updateProfilePicture(uuid, user);
-
+                userService.updateProfilePicture(uuid, user);
+                break;
+    
             case "none":
-                return this.userService.updateUser(uuid, user);
-
             default:
-                return this.userService.updateUser(uuid, user);
+                userService.updateUser(uuid, user);
+                break;
         }
+        return ResponseEntity.ok(user);
     }
+    
 
     @Operation(summary = "Delete user", description = "Delete user")
     @DeleteMapping("/{uuid}")
-    public void deleteUser(@PathVariable UUID uuid) {
-        this.userService.deleteUser(uuid);
+    public ResponseEntity<?> deleteUser(@CookieValue(name = "jwt", required = false) String token, 
+                                        @PathVariable UUID uuid) {
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No token provided");
+        }
+        
+        UUID tokenUuid = jwtService.extractUuid(token);
+        if (tokenUuid == null || !tokenUuid.equals(uuid)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or user mismatch");
+        }
+        
+        userService.deleteUser(uuid);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+    
  
     @PostMapping("/logout")
 public ResponseEntity<?> logoutUser(HttpServletResponse response) {

@@ -52,7 +52,6 @@ public class User implements UserDetails{
     @Transient
     private String newPassword;
 
-    private boolean role;
     private String bannerPicture;
     private String profilePicture;
 
@@ -95,7 +94,6 @@ public class User implements UserDetails{
         this.username = username;
         this.email = email;
         this.password = password;
-        this.role = false;
         this.enable = true;
     }
 
@@ -106,13 +104,12 @@ public class User implements UserDetails{
         this.biography = biography;
     }
 
-    public User(String username, String email, String password, String biography, String slug, boolean role) {
+    public User(String username, String email, String password, String biography, String slug) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.biography = biography;
         this.slug = slug;
-        this.role = role;
     }
 @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -162,19 +159,6 @@ public UUID getUuid() {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-
-    public boolean isRole() {
-        return this.role;
-    }
-
-    public boolean getRole() {
-        return this.role;
-    }
-
-    public void setRole(boolean role) {
-        this.role = role;
-    }
-
     public String getBannerPicture() {
         return this.bannerPicture;
     }
