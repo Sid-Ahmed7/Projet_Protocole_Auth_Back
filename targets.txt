@@ -1,13 +1,16 @@
 GET http://localhost:8080/users
 
 
-GET http://localhost:8080/users/profile/c3aa6608-f999-461b-9df4-e8a311394afe
+GET http://localhost:8080/users/profile/{uuid}
 
 POST http://localhost:8080/games/add?gameId=26668
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiYzNhYTY2MDgtZjk5OS00NjFiLTlkZjQtZThhMzExMzk0YWZlIiwic3ViIjoiYzNhYTY2MDgtZjk5OS00NjFiLTlkZjQtZThhMzExMzk0YWZlIiwiaWF0IjoxNzM5OTEyNTg0LCJleHAiOjE3Mzk5MTYxODR9.KdmnVhgyRehUTRv1vjxXSZ-nXUV1-L3qMQ8n0R-DN9s
+Authorization: Bearer {token}
 
-GET http://localhost:8080/games?user_id=c3aa6608-f999-461b-9df4-e8a311394afe
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiYzNhYTY2MDgtZjk5OS00NjFiLTlkZjQtZThhMzExMzk0YWZlIiwic3ViIjoiYzNhYTY2MDgtZjk5OS00NjFiLTlkZjQtZThhMzExMzk0YWZlIiwiaWF0IjoxNzM5OTEyNTg0LCJleHAiOjE3Mzk5MTYxODR9.KdmnVhgyRehUTRv1vjxXSZ-nXUV1-L3qMQ8n0R-DN9s
+GET http://localhost:8080/games?user_id={uuid}
+Authorization: Bearer {token}
 
 DELETE http://localhost:8080/games?gameId=26668
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiYzNhYTY2MDgtZjk5OS00NjFiLTlkZjQtZThhMzExMzk0YWZlIiwic3ViIjoiYzNhYTY2MDgtZjk5OS00NjFiLTlkZjQtZThhMzExMzk0YWZlIiwiaWF0IjoxNzM5OTEyNTg0LCJleHAiOjE3Mzk5MTYxODR9.KdmnVhgyRehUTRv1vjxXSZ-nXUV1-L3qMQ8n0R-DN9s 
+Authorization: Bearer {token} 
+
+
+
