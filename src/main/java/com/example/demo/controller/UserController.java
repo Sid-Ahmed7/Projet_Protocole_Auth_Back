@@ -165,7 +165,7 @@ public ResponseEntity<?> getProfile(@CookieValue(name = "jwt", required = false)
     
 
     @Operation(summary = "Delete user", description = "Delete user")
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping("/delete/{uuid}")
     public ResponseEntity<?> deleteUser(@CookieValue(name = "jwt", required = false) String token, 
                                         @PathVariable UUID uuid) {
         if (token == null || token.isEmpty()) {
